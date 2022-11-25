@@ -169,10 +169,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d077e78e30d3927428594187fb3478ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  horizontalInput: 0
-  speed: 10
-  xRange: 2.5
-  factor: 5
+  playerAnimator: {fileID: 3279527297666813572}
   projectilePrefab: {fileID: 0}
 --- !u!50 &676354546504521558
 Rigidbody2D:

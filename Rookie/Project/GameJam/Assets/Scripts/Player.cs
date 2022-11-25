@@ -8,57 +8,110 @@ public class Player : MonoBehaviour {
     float xRange = 2.5f;
     float factor = 5f;
     float speedIncrease = 0.01f;
-    Animator playerAnimator;
-
+    public Animator playerAnimator;
+    bool gliding = false;
+    float startH;
+    float startV;
+    public bool isAlive = true;
+    int counter = 0;
 
 
     public GameObject projectilePrefab;
     // Start is called before the first frame update
     void Start() {
-        playerAnimator = GetComponent<Animator>();
+        //playerAnimator = GetComponent<Animator>();
 
+        startH = transform.position.x;
+        startV = transform.position.y;
 
     }
 
     // Update is called once per frame
     void Update() {
 
-        bool moveMe = true;
-        horizontalInput = Input.GetAxis( "Horizontal" ) * factor * Time.deltaTime * (speed*0.1f);
-        //transform.Translate( Vector3.right * horizontalInput * Time.deltaTime * speed );
-        //Debug.Log(horizontalInput);
-        if (transform.position.x + horizontalInput < -xRange) {
-            moveMe = false;
-        }
+        if (isAlive) {
+            if (gliding) {
 
-        if (transform.position.x + horizontalInput > xRange) {
-            //transform.position = new Vector2( xRange, transform.position.y );
-            moveMe = false;
-        }
+                if (speed > 3) {
+                    Faller();
+                }
+            }
 
-        if (moveMe) {
-            transform.position = new Vector2( transform.position.x + horizontalInput, transform.position.y );
-        }
 
-        speed += speedIncrease;
+            bool moveMe = true;
+            horizontalInput = Input.GetAxis( "Horizontal" ) * factor * Time.deltaTime * (speed * 0.1f);
+            //transform.Translate( Vector3.right * horizontalInput * Time.deltaTime * speed );
+            //Debug.Log(horizontalInput);
+            if (transform.position.x + horizontalInput < -xRange) {
+                moveMe = false;
+            }
 
-        if (Input.GetKeyDown( KeyCode.Space )) {
-            Stopper();
+            if (transform.position.x + horizontalInput > xRange) {
+                //transform.position = new Vector2( xRange, transform.position.y );
+                moveMe = false;
+            }
+
+            if (moveMe) {
+                float xtraV = (speed * 0.2f);
+                if (xtraV > 10) {
+                    xtraV = 10;
+                }
+                transform.position = new Vector2( transform.position.x + horizontalInput, startV + xtraV );
+            }
+
+            speed += speedIncrease;
+            if (!gliding) {
+                if (Input.GetKeyDown( KeyCode.Space )) {
+                    Stopper();
+                }
+            }
+
+            //UpdateScore( float _speed )
+            GameManager.Instance.UpdateScore( speed );
+        } else {
+            Debug.Log( "counbter = " + counter );
+            counter++;
+            if (counter > 500) {
+                Restart();
+            }
         }
-        GameManager.Instance.speed = speed;
     }
-        void OnTriggerEnter2D( Collider2D col ) {
-            //if (col == null) {
-            Debug.Log( col.gameObject.name + " : " + gameObject.name + " : " + Time.time );
-            //}
-        }
-    void Stopper() {
-        playerAnimator.SetBool( "glide", true );
 
+
+    void OnTriggerEnter2D( Collider2D col ) {
+        //if (col == null) {
         speed = 0;
+        GameManager.Instance.speed = 0;
+        isAlive = false;
+        //Debug.Log( col.gameObject.name + " : " + gameObject.name + " : " + Time.time );
+        //}
+    }
+
+
+    void Stopper() {
+        playerAnimator.SetBool( "fall", false );
+        playerAnimator.SetBool( "glide", true );
+        gliding = true;
+        speed = speed * 0.2f;
         // change animation
     }
 
-    
+    void Faller() {
+        playerAnimator.SetBool( "glide", false );
+        playerAnimator.SetBool( "fall", true );
+        gliding = false;
+        // change animation
+    }
+
+    void Restart() {
+        playerAnimator.SetBool( "glide", false );
+        playerAnimator.SetBool( "fall", false );
+        gliding = false;
+        speed = 0;
+        transform.position = new Vector3( startH, transform.position.y, 0f );
+        counter = 0;
+        isAlive=true;
+        GameManager.Instance.distance = 0;
+    }
 
 }
