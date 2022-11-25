@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviour {
     public float speed = 2f;
     public float distance = 0;
     public TMP_Text scoreText;
+    public Crow[] crowList;
 
     private void Awake() {
         CheckGameManager();
@@ -39,11 +40,18 @@ public class GameManager : MonoBehaviour {
     public void SetupLevel() {
 
     }
+    public void ResetMe() {
 
+        foreach (var c in crowList) {
+           c.ResetCrow();
+           
+        }
+    }
     public void UpdateScore(float _speed ) {
         speed = _speed;
         distance += _speed;
-        scoreText.text = "Distance : " + distance.ToString();
+        int _score = (int)distance / 10;
+        scoreText.text = "Distance : " + _score.ToString();
     }
 
     public void CursorMode( bool _state ) {

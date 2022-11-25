@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Player : MonoBehaviour {
+
     float horizontalInput;
     float speed = 10.0f;
     float xRange = 2.5f;
     float factor = 5f;
     float speedIncrease = 0.01f;
     public Animator playerAnimator;
+    public GameObject playerDeath;
+    public GameObject playerLife;
     bool gliding = false;
     float startH;
     float startV;
@@ -23,7 +26,7 @@ public class Player : MonoBehaviour {
 
         startH = transform.position.x;
         startV = transform.position.y;
-
+        Faller();
     }
 
     // Update is called once per frame
@@ -56,7 +59,14 @@ public class Player : MonoBehaviour {
                 if (xtraV > 10) {
                     xtraV = 10;
                 }
-                transform.position = new Vector2( transform.position.x + horizontalInput, startV + xtraV );
+                float _toLerp = Mathf.Lerp( transform.position.y, startV + xtraV, 1f );
+
+                //Vector2 _targetPos = new Vector2( transform.position.x + horizontalInput, startV + xtraV );
+
+                // transform.position = Vector3.Lerp( transform.position, _targetPos, Time.deltaTime );
+
+                transform.position = new Vector2( transform.position.x + horizontalInput, _toLerp );
+
             }
 
             speed += speedIncrease;
@@ -72,6 +82,7 @@ public class Player : MonoBehaviour {
             Debug.Log( "counbter = " + counter );
             counter++;
             if (counter > 500) {
+                GameManager.Instance.ResetMe();
                 Restart();
             }
         }
@@ -83,6 +94,9 @@ public class Player : MonoBehaviour {
         speed = 0;
         GameManager.Instance.speed = 0;
         isAlive = false;
+
+        playerLife.SetActive( false );
+        playerDeath.SetActive( true );
         //Debug.Log( col.gameObject.name + " : " + gameObject.name + " : " + Time.time );
         //}
     }
@@ -104,14 +118,17 @@ public class Player : MonoBehaviour {
     }
 
     void Restart() {
-        playerAnimator.SetBool( "glide", false );
-        playerAnimator.SetBool( "fall", false );
-        gliding = false;
+        //playerAnimator.SetBool( "glide", false );
+        //playerAnimator.SetBool( "fall", true );
+        //gliding = true;
         speed = 0;
         transform.position = new Vector3( startH, transform.position.y, 0f );
         counter = 0;
         isAlive=true;
+        playerDeath.SetActive( false );
+        playerLife.SetActive( true );
         GameManager.Instance.distance = 0;
+        Faller();
     }
 
 }
