@@ -8,12 +8,14 @@ public class Player : MonoBehaviour {
     float xRange = 2.5f;
     float factor = 5f;
     float speedIncrease = 0.01f;
+    Animator playerAnimator;
 
 
 
     public GameObject projectilePrefab;
     // Start is called before the first frame update
     void Start() {
+        playerAnimator = GetComponent<Animator>();
 
 
     }
@@ -51,6 +53,7 @@ public class Player : MonoBehaviour {
             //}
         }
     void Stopper() {
+        playerAnimator.SetBool( "glide", true );
 
         speed = 0;
         // change animation
